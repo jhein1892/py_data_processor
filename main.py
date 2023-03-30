@@ -7,6 +7,9 @@
 # Second iteration, create CLI for interaction with program
 import csv
 import pandas
+import click
+import curses
+
 
 class File:
     def __init__(self, name, finalName):
@@ -25,29 +28,85 @@ class File:
 
 add = True
 baseDirectory = ''
+options = ["1", "2", "3", "4"]
 
-while add is True:
-    print(baseDirectory)
-    if len(baseDirectory) < 1:
-        baseDirectory = input("What is the absolute path to the base directory for your data files? ")
-    else:
-        newDirectory = input(f"Is this file also found in: {baseDirectory}? (y/n) ")
-        if newDirectory != 'y':
-            baseDirectory = input("What is the absolute path to the base directory for your data files? ")
+def select_options():
+    selected_options = []
+    index = 0
+    
+    # Initialize the curses library
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
+    stdscr.keypad(True)
+    
+    # Print the initial list of options
+    for i, option in enumerate(options):
+        if i == index:
+            stdscr.addstr(f"> {option}\n")
+        else:
+            stdscr.addstr(f"  {option}\n")
+    
+    # Wait for user input
+    while len(selected_options) < 3:
+        key = stdscr.getch()
+        
+        # Move the selected option up or down
+        if key == curses.KEY_UP:
+            index = (index - 1) % len(options)
+        elif key == curses.KEY_DOWN:
+            index = (index + 1) % len(options)
+        elif key == curses.KEY_ENTER or key == 10 or key == 13:
+            selected_options.append(options[index])
+        
+        # Print the updated list of options
+        stdscr.clear()
+        for i, option in enumerate(options):
+            if i == index:
+                stdscr.addstr(f"> {option}\n")
+            else:
+                stdscr.addstr(f"  {option}\n")
+    
+    # Clean up the curses library
+    curses.nocbreak()
+    stdscr.keypad(False)
+    curses.echo()
+    curses.endwin()
+    
+    return selected_options
 
-    name = input("What is the name of file you'd like to filter? ")
-    finalName = input("What would you like to name the file containing the filtered data? ")
-    fileName = baseDirectory + '/' + name
-
-    newFile = File(fileName, finalName)
-    newFile.description()
-    # newFile.readFile()
-    userContinue = input("Would you like to filter another file? (y/n) ")
-    if userContinue !='y':
-        add = False
+# Call the select_options function and print the selected options
+selected = select_options()
+print(f"Selected options: {selected}")
 
 
-print("Thank you for using our data processor!")
+# while add is True:
+
+
+
+
+
+#     # print(baseDirectory)
+#     # if len(baseDirectory) < 1:
+#     #     baseDirectory = input("What is the absolute path to the base directory for your data files? ")
+#     # else:
+#     #     newDirectory = input(f"Is this file also found in: {baseDirectory}? (y/n) ")
+#     #     if newDirectory != 'y':
+#     #         baseDirectory = input("What is the absolute path to the base directory for your data files? ")
+
+#     # name = input("What is the name of file you'd like to filter? ")
+#     # finalName = input("What would you like to name the file containing the filtered data? ")
+#     # fileName = baseDirectory + '/' + name
+
+#     # newFile = File(fileName, finalName)
+#     # newFile.description()
+#     # # newFile.readFile()
+#     # userContinue = input("Would you like to filter another file? (y/n) ")
+#     # if userContinue !='y':
+#     #     add = False
+
+
+# print("Thank you for using our data processor!")
 
 
 
