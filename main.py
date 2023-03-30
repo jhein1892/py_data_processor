@@ -22,6 +22,36 @@ class File:
         nullDf.to_csv(self.final, index = False) # create and write a new file with the updated files.
 
 
-newFile = File('/Users/jacobhein/Documents/MLBData/test.csv', 'newText.csv')
-newFile.description()
-newFile.readFile()
+
+add = True
+baseDirectory = ''
+
+while add is True:
+    print(baseDirectory)
+    if len(baseDirectory) < 1:
+        baseDirectory = input("What is the absolute path to the base directory for your data files? ")
+    else:
+        newDirectory = input(f"Is this file also found in: {baseDirectory}? (y/n) ")
+        if newDirectory != 'y':
+            baseDirectory = input("What is the absolute path to the base directory for your data files? ")
+
+    name = input("What is the name of file you'd like to filter? ")
+    finalName = input("What would you like to name the file containing the filtered data? ")
+    fileName = baseDirectory + '/' + name
+
+    newFile = File(fileName, finalName)
+    newFile.description()
+    # newFile.readFile()
+    userContinue = input("Would you like to filter another file? (y/n) ")
+    if userContinue !='y':
+        add = False
+
+
+print("Thank you for using our data processor!")
+
+
+
+
+
+    
+# /Users/jacobhein/Documents/MLBData/test.csv
