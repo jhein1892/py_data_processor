@@ -47,8 +47,8 @@ class File:
         
         
         # Print the initial list of options
+        stdscr.addstr(f"What Column would you like to filter by?\n")
         for i, option in enumerate(self.column_names):
-            print(option)
             if i == index:
                 stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
             else:
@@ -65,10 +65,14 @@ class File:
                 index = (index + 1) % len(self.column_names)
             elif key == curses.KEY_ENTER or key == 10 or key == 13:
                 self.filterColumn = self.column_names[index]
+                stdscr.clear()
+                self.setOperatorFilter(stdscr)
+
                 chosen = True
             
-            # Print the updated list of options
             stdscr.clear()
+            stdscr.addstr(f"What Column would you like to filter by?\n")
+            # Print the updated list of options
             for i, option in enumerate(self.column_names):
                 if i == index:
                     stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
@@ -80,7 +84,66 @@ class File:
         stdscr.keypad(False)
         curses.echo()
         curses.endwin()
+    
+    def setOperatorFilter(self, stdscr):
+        index = 0 # So we know where we are in the list
+        chosen = False
+        options = ['<', '>', '=', '<=', '>=']
+
+        stdscr.addstr(f"{self.filterColumn} is ____\n")
+        # Print the initial list of options
+        for i, option in enumerate(options):
+            print(option)
+            if i == index:
+                stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
+            else:
+                stdscr.addstr(f"  {option}\n")
         
+
+        while chosen is False:
+            key = stdscr.getch()
+            # Move the selected option up or down
+            if key == curses.KEY_UP:
+                index = (index - 1) % len(options)
+            elif key == curses.KEY_DOWN:
+                index = (index + 1) % len(options)
+            elif key == curses.KEY_ENTER or key == 10 or key == 13:
+                self.operator = options[index]
+                stdscr.clear()
+                self.setValueFilter(stdscr)
+                chosen = True
+            
+            # Print the updated list of options
+            stdscr.clear()
+            stdscr.addstr(f"{self.filterColumn} is ____\n")
+            for i, option in enumerate(options):
+                if i == index:
+                    stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
+                else:
+                    stdscr.addstr(f"  {option}\n")
+
+    def setValueFilter(self, stdscr):
+        index = 0 # So we know where we are in the list
+        chosen = False
+        options = ['0', '1', '5', '25', '100']
+        valueStr = ''
+
+        stdscr.addstr(f"{self.filterColumn} is {self.operator} ____\n")
+        stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
+
+        while chosen is False:
+            key = stdscr.getch()
+            if key == curses.KEY_ENTER or key == 10 or key == 13:
+                self.value = valueStr
+                stdscr.clear()
+                chosen = True
+            else:
+                valueStr += key
+            
+            # Print the updated list of options
+            stdscr.clear()
+            stdscr.addstr(f"{self.filterColumn} is {self.operator} ____\n")
+            stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
 
     def setFilterParams(self):
         print('In FilterParams')
@@ -91,10 +154,12 @@ class File:
         while moreFilters:
             self.setColumnFilter()
             print(f"Your chosen Column is: {self.filterColumn}")
+            print(f"Your chosen Operator is: {self.operator}")
+            print(f"Your chosen Operator is: {self.value}")
+            # if self.filterColumn:
+            #     self.setOperatorFilter()
+
             moreFilters = False
-        # First Pick column
-        
-        # Second Pick operation (<, >, =, <=, >=)
 
         # Third Pick value (string or number)
         
