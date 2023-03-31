@@ -20,6 +20,7 @@ class File:
     def description(self):
         print(f"We are reading from {self.name}, and turning it into {self.final}")
 
+    # Opening and reading the CSV file
     def readFile(self):
         df = pandas.read_csv(self.name)
         self.df = df
@@ -32,8 +33,8 @@ class File:
     def getColumns(self): #
         self.column_names = self.df.columns
         self.setFilterParams()
-        
-    
+
+    # Set the Column to filter by        
     def setColumnFilter(self):
         print('setColumnFilter')
         index = 0 # So we know where we are in the list
@@ -85,6 +86,7 @@ class File:
         curses.echo()
         curses.endwin()
     
+    # Set the operation to filter by
     def setOperatorFilter(self, stdscr):
         index = 0 # So we know where we are in the list
         chosen = False
@@ -122,6 +124,7 @@ class File:
                 else:
                     stdscr.addstr(f"  {option}\n")
 
+    # Set the value to filter by
     def setValueFilter(self, stdscr):
         index = 0 # So we know where we are in the list
         chosen = False
@@ -147,23 +150,18 @@ class File:
             stdscr.addstr(f"{self.filterColumn} is {self.operator} ____\n")
             stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
 
+    # Driver for setting the filter Params
     def setFilterParams(self):
         print('In FilterParams')
         moreFilters = True
-        # So this is going to start to build us our filtering parameters
-        # We want to first display all of our column names as options.
-        # I want this to be like building a query for sql, but we are going to build a pandas function.
+
         while moreFilters:
             self.setColumnFilter()
-            print(f"Your chosen Column is: {self.filterColumn}")
-            print(f"Your chosen Operator is: {self.operator}")
-            print(f"Your chosen Operator is: {self.value}")
-            # if self.filterColumn:
-            #     self.setOperatorFilter()
+            print(f"You want to filter {self.filterColumn} where it is {self.operator} {self.value}")
+            # Provide option to change this. We will just restart the .setColumnFilter() function, resetting all of our instance variables
 
             moreFilters = False
 
-        # Third Pick value (string or number)
         
 
 
@@ -204,60 +202,3 @@ print("Thank you for using our data processor!")
 
     
 # /Users/jacobhein/Documents/MLBData/test.csv
-
-
-
-
-
-#### THIS IS FOR THE COMMAND LINE INTEREACTION ####
-# options = ["1", "2", "3", "4"]
-
-# def select_options():
-#     selected_options = []
-#     index = 0
-    
-#     # Initialize the curses library
-#     stdscr = curses.initscr()
-#     curses.noecho()
-#     curses.cbreak()
-#     stdscr.keypad(True)
-    
-#     # Print the initial list of options
-#     for i, option in enumerate(options):
-#         if i == index:
-#             stdscr.addstr(f"> {option}\n")
-#         else:
-#             stdscr.addstr(f"  {option}\n")
-    
-#     # Wait for user input
-#     while len(selected_options) < 3:
-#         key = stdscr.getch()
-        
-#         # Move the selected option up or down
-#         if key == curses.KEY_UP:
-#             index = (index - 1) % len(options)
-#         elif key == curses.KEY_DOWN:
-#             index = (index + 1) % len(options)
-#         elif key == curses.KEY_ENTER or key == 10 or key == 13:
-#             selected_options.append(options[index])
-        
-#         # Print the updated list of options
-#         stdscr.clear()
-#         for i, option in enumerate(options):
-#             if i == index:
-#                 stdscr.addstr(f"> {option}\n")
-#             else:
-#                 stdscr.addstr(f"  {option}\n")
-    
-#     # Clean up the curses library
-#     curses.nocbreak()
-#     stdscr.keypad(False)
-#     curses.echo()
-#     curses.endwin()
-    
-#     return selected_options
-
-# # Call the select_options function and print the selected options
-# selected = select_options()
-# print(f"Selected options: {selected}")
-####### #############
