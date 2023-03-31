@@ -137,6 +137,8 @@ class File:
                 self.value = valueStr
                 stdscr.clear()
                 chosen = True
+            elif key == curses.KEY_BACKSPACE or key == 127 or key == 263:
+                valueStr = valueStr[:-1]
             else:
                 valueStr += curses.keyname(key).decode('utf-8')
             
