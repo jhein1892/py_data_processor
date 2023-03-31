@@ -138,7 +138,7 @@ class File:
                 stdscr.clear()
                 chosen = True
             else:
-                valueStr += key
+                valueStr += curses.keyname(key).decode('utf-8')
             
             # Print the updated list of options
             stdscr.clear()
