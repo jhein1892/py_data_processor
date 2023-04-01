@@ -2,12 +2,11 @@
     # Making this object oriented: 
     # a class 'File', is instantiated with every new file that needs to be filtered. We take in a name, then prompt questions to determine columns values etc.
 
-# First iteration: Hard Code the file name, the columns and conditions to filter by and the file name for the output file
-
 # Second iteration, create CLI for interaction with program
 import csv
 import pandas
 import curses
+import operator
 
 
 class File:
@@ -67,8 +66,7 @@ class File:
             elif key == curses.KEY_ENTER or key == 10 or key == 13:
                 self.filterColumn = self.column_names[index]
                 stdscr.clear()
-                self.setOperatorFilter(stdscr)
-
+                # self.setOperatorFilter(stdscr)
                 chosen = True
             
             stdscr.clear()
@@ -85,12 +83,13 @@ class File:
         stdscr.keypad(False)
         curses.echo()
         curses.endwin()
+
     
     # Set the operation to filter by
     def setOperatorFilter(self, stdscr):
         index = 0 # So we know where we are in the list
         chosen = False
-        options = ['<', '>', '=', '<=', '>=']
+        options = ['<', '>', '==', '!=', '<=', '>=']
 
         stdscr.addstr(f"{self.filterColumn} is ____\n")
         # Print the initial list of options
@@ -150,22 +149,43 @@ class File:
             stdscr.addstr(f"{self.filterColumn} is {self.operator} ____\n")
             stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
 
+    #Update the data frame to be filtered accoring to values
+    def updatedDataFrame(self):
+        op_dict ={
+            "<": operator.lt,
+            "<=": operator.le,
+            ">": operator.gt,
+            ">=": operator.ge,
+            "==": operator.eq,
+            "!=": operator.ne
+        }
+
+        op_func = op_dict[self.operator] # get opterator that we chose
+        newDF = self.df.copy()
+        if self.value.isnumeric():
+            self.value = float(self.value)
+        
+        print(f"Updating {self.name} where {self.filterColumn} is {self.operator} {self.value}")
+        newDF = newDF[newDF[self.filterColumn].apply(lambda x: op_func(x, self.value))]
+        self.df = newDF
+
+    def generateNewFile(self):
+        self.df.to_csv(self.final, index = False) # create and write a new file with the updated files.
+
     # Driver for setting the filter Params
     def setFilterParams(self):
         print('In FilterParams')
-        moreFilters = True
+        moreFilters = 'y'
 
-        while moreFilters:
+        while moreFilters == 'y':
             self.setColumnFilter()
-            print(f"You want to filter {self.filterColumn} where it is {self.operator} {self.value}")
-            # Provide option to change this. We will just restart the .setColumnFilter() function, resetting all of our instance variables
+            # self.updatedDataFrame()
+            moreFilters = input("Would you like to filter by another column?(y/n)")
 
-            moreFilters = False
-
-        
-
-
-
+        self.generateNewFile()
+            # moreFilters = False
+    
+    # jusgt keep the same df until we are ready to create new fie with the updated data
 
 add = True
 baseDirectory = ''
@@ -194,7 +214,7 @@ while add is True:
         add = False
 
 
-print("Thank you for using our data processor!")
+print("Thank you for using our data processor, your updated file should be available now!")
 
 
 
