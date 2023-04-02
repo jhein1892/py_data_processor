@@ -1,16 +1,11 @@
-# General Idea: Take in data from a CSV file filter the data according to some conditions, write the results to another CSV file.
-    # Making this object oriented: 
-    # a class 'File', is instantiated with every new file that needs to be filtered. We take in a name, then prompt questions to determine columns values etc.
-
-# Second iteration, create CLI for interaction with program
 import csv
 import pandas
 import curses
 import operator
 
+# /Users/jacobhein/Documents/MLBData       
 
 class File:
-
     def __init__(self, name, finalName):
         self.name = name # The file name that we are reading from
         self.final = finalName # What we are going to name the file once we've completed the filter
@@ -24,9 +19,6 @@ class File:
         df = pandas.read_csv(self.name)
         self.df = df
         self.getColumns()
-    
-        # nullDf = df.dropna() # All rows with a Nan value are being dropped
-        # nullDf.to_csv(self.final, index = False) # create and write a new file with the updated files.
 
     # Get the columns for this file
     def getColumns(self): #
@@ -176,9 +168,7 @@ class File:
 
     # Driver for setting the filter Params
     def setFilterParams(self):
-        print('In FilterParams')
         moreFilters = 'y'
-
         while moreFilters == 'y':
             self.setColumnFilter()
             self.updatedDataFrame()
@@ -186,14 +176,8 @@ class File:
 
         self.generateNewFile()
     
-    # jusgt keep the same df until we are ready to create new fie with the updated data
-
 add = True
 baseDirectory = ''
-
-
-
-
 
 while add is True:
 
@@ -214,13 +198,4 @@ while add is True:
     if userContinue !='y':
         add = False
 
-
 print("Thank you for using our data processor, your updated file should be available now!")
-
-
-
-
-
-    
-# /Users/jacobhein/Documents/MLBData/test.csv
-        
