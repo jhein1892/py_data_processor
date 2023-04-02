@@ -47,7 +47,10 @@ class File:
         
         
         # Print the initial list of options
+        stdscr.clear()
         stdscr.addstr(f"What Column would you like to filter by?\n")
+        stdscr.addstr(f"Index {index}\n", curses.A_STANDOUT)
+        stdscr.addstr(f"Chosen {chosen}\n", curses.A_STANDOUT)
         for i, option in enumerate(self.column_names):
             if i == index:
                 stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
@@ -66,7 +69,7 @@ class File:
             elif key == curses.KEY_ENTER or key == 10 or key == 13:
                 self.filterColumn = self.column_names[index]
                 stdscr.clear()
-                # self.setOperatorFilter(stdscr)
+                self.setOperatorFilter(stdscr)
                 chosen = True
             
             stdscr.clear()
@@ -84,7 +87,6 @@ class File:
         curses.echo()
         curses.endwin()
 
-    
     # Set the operation to filter by
     def setOperatorFilter(self, stdscr):
         index = 0 # So we know where we are in the list
@@ -179,7 +181,7 @@ class File:
 
         while moreFilters == 'y':
             self.setColumnFilter()
-            # self.updatedDataFrame()
+            self.updatedDataFrame()
             moreFilters = input("Would you like to filter by another column?(y/n)")
 
         self.generateNewFile()
@@ -222,3 +224,4 @@ print("Thank you for using our data processor, your updated file should be avail
 
     
 # /Users/jacobhein/Documents/MLBData/test.csv
+        
