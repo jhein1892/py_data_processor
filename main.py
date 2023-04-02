@@ -185,7 +185,6 @@ class File:
             moreFilters = input("Would you like to filter by another column?(y/n)")
 
         self.generateNewFile()
-            # moreFilters = False
     
     # jusgt keep the same df until we are ready to create new fie with the updated data
 
