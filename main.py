@@ -20,6 +20,7 @@ class File:
     def description(self):
         print(f"We are reading from {self.name}, and turning it into {self.final}")
 
+    # Supplemental function used to time execution of function
     def timing_decorator(func):
         def wrapper(*args, **kwargs):
             start_time = time.time()
@@ -28,6 +29,7 @@ class File:
             print(f"Elapsed time: {round(end_time - start_time, 4)} seconds")
             return result
         return wrapper
+    
     # Opening and reading the CSV file
     def readFile(self):
         df = pandas.read_csv(self.name)
