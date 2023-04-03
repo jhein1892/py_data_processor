@@ -2,23 +2,48 @@ import csv
 import pandas
 import curses
 import operator
+import time
+import os.path
 
 # /Users/jacobhein/Documents/MLBData       
 
 class File:
     def __init__(self, name, finalName):
-        self.name = name # The file name that we are reading from
-        self.final = finalName # What we are going to name the file once we've completed the filter
-        self.readFile()
+        if os.path.isfile(name.strip()):
+            self.final = finalName.strip() # What we are going to name the file once we've completed the filter
+            self.name = name.strip() # The file name that we are reading from
+            self._checkExt()
+            self.readFile()
+        else:
+            print('No Bueno')
 
     def description(self):
         print(f"We are reading from {self.name}, and turning it into {self.final}")
 
+    def timing_decorator(func):
+        def wrapper(*args, **kwargs):
+            start_time = time.time()
+            result = func(*args, **kwargs)
+            end_time = time.time()
+            print(f"Elapsed time: {round(end_time - start_time, 4)} seconds")
+            return result
+        return wrapper
     # Opening and reading the CSV file
     def readFile(self):
         df = pandas.read_csv(self.name)
         self.df = df
         self.getColumns()
+
+    def _checkExt(self):
+        finalExt = os.path.splitext(self.final)
+        currentExt = os.path.splitext(self.name)
+        if finalExt[-1].lower() != currentExt[-1].lower():
+            self.final = os.path.join(
+                os.path.basename(self.final),
+                currentExt[1].lower()
+            ).replace('/','')
+
+        print(f"finalxt: {finalExt}\next: {currentExt}")
 
     # Get the columns for this file
     def getColumns(self): #
@@ -144,6 +169,7 @@ class File:
             stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
 
     #Update the data frame to be filtered accoring to values
+    @timing_decorator
     def updatedDataFrame(self):
         op_dict ={
             "<": operator.lt,
@@ -163,6 +189,8 @@ class File:
         newDF = newDF[newDF[self.filterColumn].apply(lambda x: op_func(x, self.value))]
         self.df = newDF
 
+    # Generating the updated CSV file with the filters
+    @timing_decorator
     def generateNewFile(self):
         self.df.to_csv(self.final, index = False) # create and write a new file with the updated files.
 
@@ -183,19 +211,20 @@ while add is True:
 
     if len(baseDirectory) < 1:
         baseDirectory = input("What is the absolute path to the base directory for your data files? ")
+
     else:
         newDirectory = input(f"Is this file also found in: {baseDirectory}? (y/n) ")
         if newDirectory != 'y':
             baseDirectory = input("What is the absolute path to the base directory for your data files? ")
 
+
     name = input("What is the name of file you'd like to filter? ")
     finalName = input("What would you like to name the file containing the filtered data? ")
-    fileName = baseDirectory + '/' + name
-
+    fileName = baseDirectory.strip() + '/' + name
     newFile = File(fileName, finalName) # Create new File
 
     userContinue = input("Would you like to filter another file? (y/n) ")
     if userContinue !='y':
         add = False
 
-print("Thank you for using our data processor, your updated file should be available now!")
+print("Thank you for using our data processor!")
