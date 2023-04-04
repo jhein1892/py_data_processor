@@ -55,7 +55,6 @@ class File:
 
     # Set the Column to filter by        
     def _setColumnFilter(self):
-        print('setColumnFilter')
         index = 0 # So we know where we are in the list
 
         # Print the initial list of options
@@ -89,19 +88,6 @@ class File:
 
         
         curses.wrapper(getColumnFilter,index)
-        # with curses.wrapper(lambda stdscr: curses.noecho() and curses.cbreak() and stdscr.keypad(True)):
-        # stdscr = curses.wrapper(lambda stdscr: curses.noecho() and curses.cbreak() and stdscr.keypad(True))
-        
-    
-
-        
-        
-        # Clean up the curses library
-        # curses.echo()
-        # curses.nocbreak()
-        # curses.curs_set(1)
-        # stdscr.keypad(False)
-        # curses.endwin()
 
     # Set the operation to filter by
     def _setOperatorFilter(self, stdscr):
@@ -109,16 +95,17 @@ class File:
         chosen = False
         options = ['<', '>', '==', '!=', '<=', '>=']
 
-        stdscr.addstr(f"{self.filterColumn} is ____\n")
         # Print the initial list of options
-        for i, option in enumerate(options):
-            print(option)
-            if i == index:
-                stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
-            else:
-                stdscr.addstr(f"  {option}\n")
+        def draw(stdscr, index):
+            stdscr.clear()
+            stdscr.addstr(f"{self.filterColumn} is ____\n")
+            for i, option in enumerate(options):
+                if i == index:
+                    stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
+                else:
+                    stdscr.addstr(f"  {option}\n")
         
-
+        draw(stdscr, index)
         while chosen is False:
             key = stdscr.getch()
             # Move the selected option up or down
@@ -132,14 +119,7 @@ class File:
                 self._setValueFilter(stdscr)
                 chosen = True
             
-            # Print the updated list of options
-            stdscr.clear()
-            stdscr.addstr(f"{self.filterColumn} is ____\n")
-            for i, option in enumerate(options):
-                if i == index:
-                    stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
-                else:
-                    stdscr.addstr(f"  {option}\n")
+            draw(stdscr, index)
 
     # Set the value to filter by
     def _setValueFilter(self, stdscr):
@@ -148,9 +128,13 @@ class File:
         options = ['0', '1', '5', '25', '100']
         valueStr = ''
 
-        stdscr.addstr(f"{self.filterColumn} is {self.operator} ____\n")
-        stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
+        def draw(stdscr):
+            stdscr.clear()
+            stdscr.addstr(f"{self.filterColumn} is {self.operator} ____\n")
+            stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
 
+    
+        draw(stdscr)
         while chosen is False:
             key = stdscr.getch()
             if key == curses.KEY_ENTER or key == 10 or key == 13:
@@ -162,10 +146,7 @@ class File:
             else:
                 valueStr += curses.keyname(key).decode('utf-8')
             
-            # Print the updated list of options
-            stdscr.clear()
-            stdscr.addstr(f"{self.filterColumn} is {self.operator} ____\n")
-            stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
+            draw(stdscr)
 
     #Update the data frame to be filtered accoring to values
     @_timing_decorator
