@@ -56,38 +56,47 @@ class File:
     # Set the Column to filter by        
     def _setColumnFilter(self):
         index = 0 # So we know where we are in the list
+        height, width = curses.initscr().getmaxyx()
+        pad = curses.newpad(len(self.column_names), width)
 
         # Print the initial list of options
-        def draw(stdscr, index):
+        def draw(stdscr, index, offset):
             stdscr.clear()
+            pad.refresh(offset, 0, 0, 0, height - 1, width - 1)
             stdscr.addstr(f"What Column would you like to filter by?\n")
             for i, option in enumerate(self.column_names):
                 if i == index:
                     stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
+                elif abs(i  - index) <= 2 :
+                    stdscr.addstr(f" {option}\n")
                 else:
-                    stdscr.addstr(f"  {option}\n")
+                    pad.addstr(i, 0, option)
+            stdscr.refresh()
 
-        def getColumnFilter(stdscr,index):
-            draw(stdscr, index)
+        def getColumnFilter(stdscr,index,offset):
+            draw(stdscr, index, offset)
             chosen = False
             while chosen is False:
                 key = stdscr.getch()
                 
                 # Move the selected option up or down
                 if key == curses.KEY_UP:
-                    index = (index - 1) % len(self.column_names)
+                    index = max(index - 1, 0)
+                    if index < offset:
+                        offset -= 1
                 elif key == curses.KEY_DOWN:
-                    index = (index + 1) % len(self.column_names)
+                    index = min(index + 1, len(self.column_names) - 1)
+                    if index >= offset + height - 1:
+                        offset += 1
                 elif key == curses.KEY_ENTER or key == 10 or key == 13:
                     self.filterColumn = self.column_names[index]
                     stdscr.clear()
                     self._setOperatorFilter(stdscr)
                     chosen = True
 
-                draw(stdscr, index)  
+                draw(stdscr, index, offset)  
 
-        
-        curses.wrapper(getColumnFilter,index)
+        curses.wrapper(getColumnFilter, index, 0)            
 
     # Set the operation to filter by
     def _setOperatorFilter(self, stdscr):
