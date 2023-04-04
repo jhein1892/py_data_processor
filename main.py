@@ -8,12 +8,13 @@ import os.path
 # /Users/jacobhein/Documents/MLBData       
 
 class File:
+
     def __init__(self, name, finalName):
         if os.path.isfile(name.strip()):
             self.final = finalName.strip() # What we are going to name the file once we've completed the filter
             self.name = name.strip() # The file name that we are reading from
             self._checkExt()
-            self.readFile()
+            self._readFile()
         else:
             print('No Bueno')
 
@@ -21,7 +22,7 @@ class File:
         print(f"We are reading from {self.name}, and turning it into {self.final}")
 
     # Supplemental function used to time execution of function
-    def timing_decorator(func):
+    def _timing_decorator(func):
         def wrapper(*args, **kwargs):
             start_time = time.time()
             result = func(*args, **kwargs)
@@ -31,10 +32,10 @@ class File:
         return wrapper
     
     # Opening and reading the CSV file
-    def readFile(self):
+    def _readFile(self):
         df = pandas.read_csv(self.name)
         self.df = df
-        self.getColumns()
+        self._getColumns()
 
     def _checkExt(self):
         finalExt = os.path.splitext(self.final)
@@ -48,66 +49,62 @@ class File:
         print(f"finalxt: {finalExt}\next: {currentExt}")
 
     # Get the columns for this file
-    def getColumns(self): #
+    def _getColumns(self): #
         self.column_names = self.df.columns
-        self.setFilterParams()
+        self._setFilterParams()
 
     # Set the Column to filter by        
-    def setColumnFilter(self):
+    def _setColumnFilter(self):
         print('setColumnFilter')
         index = 0 # So we know where we are in the list
-        chosen = False
 
-        # Initialize the curses library
-        stdscr = curses.initscr()
-        curses.noecho()
-        curses.cbreak()
-        stdscr.keypad(True)
-        
-        
         # Print the initial list of options
-        stdscr.clear()
-        stdscr.addstr(f"What Column would you like to filter by?\n")
-        stdscr.addstr(f"Index {index}\n", curses.A_STANDOUT)
-        stdscr.addstr(f"Chosen {chosen}\n", curses.A_STANDOUT)
-        for i, option in enumerate(self.column_names):
-            if i == index:
-                stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
-            else:
-                stdscr.addstr(f"  {option}\n")
-        
-
-        while chosen is False:
-            key = stdscr.getch()
-            
-            # Move the selected option up or down
-            if key == curses.KEY_UP:
-                index = (index - 1) % len(self.column_names)
-            elif key == curses.KEY_DOWN:
-                index = (index + 1) % len(self.column_names)
-            elif key == curses.KEY_ENTER or key == 10 or key == 13:
-                self.filterColumn = self.column_names[index]
-                stdscr.clear()
-                self.setOperatorFilter(stdscr)
-                chosen = True
-            
+        def draw(stdscr, index):
             stdscr.clear()
             stdscr.addstr(f"What Column would you like to filter by?\n")
-            # Print the updated list of options
             for i, option in enumerate(self.column_names):
                 if i == index:
                     stdscr.addstr(f"> {option}\n", curses.A_STANDOUT)
                 else:
                     stdscr.addstr(f"  {option}\n")
+
+        def getColumnFilter(stdscr,index):
+            draw(stdscr, index)
+            chosen = False
+            while chosen is False:
+                key = stdscr.getch()
+                
+                # Move the selected option up or down
+                if key == curses.KEY_UP:
+                    index = (index - 1) % len(self.column_names)
+                elif key == curses.KEY_DOWN:
+                    index = (index + 1) % len(self.column_names)
+                elif key == curses.KEY_ENTER or key == 10 or key == 13:
+                    self.filterColumn = self.column_names[index]
+                    stdscr.clear()
+                    self._setOperatorFilter(stdscr)
+                    chosen = True
+
+                draw(stdscr, index)  
+
+        
+        curses.wrapper(getColumnFilter,index)
+        # with curses.wrapper(lambda stdscr: curses.noecho() and curses.cbreak() and stdscr.keypad(True)):
+        # stdscr = curses.wrapper(lambda stdscr: curses.noecho() and curses.cbreak() and stdscr.keypad(True))
+        
+    
+
+        
         
         # Clean up the curses library
-        curses.nocbreak()
-        stdscr.keypad(False)
-        curses.echo()
-        curses.endwin()
+        # curses.echo()
+        # curses.nocbreak()
+        # curses.curs_set(1)
+        # stdscr.keypad(False)
+        # curses.endwin()
 
     # Set the operation to filter by
-    def setOperatorFilter(self, stdscr):
+    def _setOperatorFilter(self, stdscr):
         index = 0 # So we know where we are in the list
         chosen = False
         options = ['<', '>', '==', '!=', '<=', '>=']
@@ -132,7 +129,7 @@ class File:
             elif key == curses.KEY_ENTER or key == 10 or key == 13:
                 self.operator = options[index]
                 stdscr.clear()
-                self.setValueFilter(stdscr)
+                self._setValueFilter(stdscr)
                 chosen = True
             
             # Print the updated list of options
@@ -145,7 +142,7 @@ class File:
                     stdscr.addstr(f"  {option}\n")
 
     # Set the value to filter by
-    def setValueFilter(self, stdscr):
+    def _setValueFilter(self, stdscr):
         index = 0 # So we know where we are in the list
         chosen = False
         options = ['0', '1', '5', '25', '100']
@@ -171,8 +168,8 @@ class File:
             stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
 
     #Update the data frame to be filtered accoring to values
-    @timing_decorator
-    def updatedDataFrame(self):
+    @_timing_decorator
+    def _updatedDataFrame(self):
         op_dict ={
             "<": operator.lt,
             "<=": operator.le,
@@ -192,19 +189,19 @@ class File:
         self.df = newDF
 
     # Generating the updated CSV file with the filters
-    @timing_decorator
-    def generateNewFile(self):
+    @_timing_decorator
+    def _generateNewFile(self):
         self.df.to_csv(self.final, index = False) # create and write a new file with the updated files.
 
     # Driver for setting the filter Params
-    def setFilterParams(self):
+    def _setFilterParams(self):
         moreFilters = 'y'
         while moreFilters == 'y':
-            self.setColumnFilter()
-            self.updatedDataFrame()
+            self._setColumnFilter()
+            self._updatedDataFrame()
             moreFilters = input("Would you like to filter by another column?(y/n)")
 
-        self.generateNewFile()
+        self._generateNewFile()
     
 add = True
 baseDirectory = ''
