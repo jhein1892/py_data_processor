@@ -3,6 +3,8 @@ import pandas
 import curses
 import operator
 import time
+import colorama
+from colorama import Fore
 import os.path
 
 # /Users/jacobhein/Documents/MLBData       
@@ -16,7 +18,7 @@ class File:
             self._checkExt()
             self._readFile()
         else:
-            print('No Bueno')
+            print(Fore.RED + 'No Bueno' + Fore.WHITE)
 
     def description(self):
         print(f"We are reading from {self.name}, and turning it into {self.final}")
@@ -27,7 +29,7 @@ class File:
             start_time = time.time()
             result = func(*args, **kwargs)
             end_time = time.time()
-            print(f"Elapsed time: {round(end_time - start_time, 4)} seconds")
+            print(Fore.YELLOW + f"{func.__name__} Elapsed time: {round(end_time - start_time, 4)} seconds" + Fore.WHITE)
             return result
         return wrapper
     
@@ -45,8 +47,6 @@ class File:
                 os.path.basename(self.final),
                 currentExt[1].lower()
             ).replace('/','')
-
-        print(f"finalxt: {finalExt}\next: {currentExt}")
 
     # Get the columns for this file
     def _getColumns(self): #
@@ -159,7 +159,7 @@ class File:
 
     #Update the data frame to be filtered accoring to values
     @_timing_decorator
-    def _updatedDataFrame(self):
+    def _updateDataFrame(self):
         op_dict ={
             "<": operator.lt,
             "<=": operator.le,
@@ -175,8 +175,13 @@ class File:
             self.value = float(self.value)
         
         print(f"Updating {self.name} where {self.filterColumn} is {self.operator} {self.value}")
-        newDF = newDF[newDF[self.filterColumn].apply(lambda x: op_func(x, self.value))]
-        self.df = newDF
+        try:
+            newDF = newDF[newDF[self.filterColumn].apply(lambda x: op_func(x, self.value))]
+            self.df = newDF
+        except:
+            print(Fore.RED + f"Oops. Seems like you've entered a wrong value type for this column" + Fore.WHITE)
+            return
+
 
     # Generating the updated CSV file with the filters
     @_timing_decorator
@@ -188,8 +193,8 @@ class File:
         moreFilters = 'y'
         while moreFilters == 'y':
             self._setColumnFilter()
-            self._updatedDataFrame()
-            moreFilters = input("Would you like to filter by another column?(y/n)")
+            self._updateDataFrame()
+            moreFilters = input("Would you like to filter by another column?(y/n) ")
 
         self._generateNewFile()
     
@@ -209,7 +214,8 @@ while add is True:
 
     name = input("What is the name of file you'd like to filter? ")
     finalName = input("What would you like to name the file containing the filtered data? ")
-    fileName = baseDirectory.strip() + '/' + name
+    baseDirectory = baseDirectory.strip()
+    fileName = baseDirectory + '/' + name
     newFile = File(fileName, finalName) # Create new File
 
     userContinue = input("Would you like to filter another file? (y/n) ")
