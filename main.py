@@ -1,9 +1,7 @@
-import csv
 import pandas
 import curses
 import operator
 import time
-import colorama
 from colorama import Fore
 import os.path
 
