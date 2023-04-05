@@ -1,11 +1,19 @@
 # Py Data Processor
 This Python application allows you to filter a CSV file by a specified column, operator, and value. The resulting filtered data is then saved as a new CSV file.
 
+## Installation
+The Py Data Processor requires Python 3.x and the following libraries: 
+- pandas
+- curses
+- operator
+- time
+- colorama
+
 ## Getting Started
 1. Clone the repository onto your local machine.
-2. Ensure that you have pandas, csv, and curses installed by running `pip install pandas csv curses`.
+2. Ensure that you have all libraries installed by running `pip install pandas curses operator time colorama`.
 3. Open a terminal window and navigate to the directory containing the main.py file.
-4. Run python main.py.
+4. Run `python main.py`.
 5. Follow the on-screen prompts to select the CSV file you wish to filter and provide the necessary filtering criteria.
 
 ## How to Use
