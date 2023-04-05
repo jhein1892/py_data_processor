@@ -18,7 +18,7 @@ class File:
             self._checkExt()
             self._readFile()
         else:
-            print(Fore.RED + 'No Bueno' + Fore.WHITE)
+            print(Fore.RED + 'Document Path name not recognized' + Fore.WHITE)
 
     def description(self):
         print(f"We are reading from {self.name}, and turning it into {self.final}")
@@ -74,9 +74,9 @@ class File:
             stdscr.refresh()
 
         def getColumnFilter(stdscr,index,offset):
-            draw(stdscr, index, offset)
             chosen = False
             while chosen is False:
+                draw(stdscr, index, offset)
                 key = stdscr.getch()
                 
                 # Move the selected option up or down
@@ -93,8 +93,6 @@ class File:
                     stdscr.clear()
                     self._setOperatorFilter(stdscr)
                     chosen = True
-
-                draw(stdscr, index, offset)  
 
         curses.wrapper(getColumnFilter, index, 0)            
 
@@ -114,8 +112,8 @@ class File:
                 else:
                     stdscr.addstr(f"  {option}\n")
         
-        draw(stdscr, index)
         while chosen is False:
+            draw(stdscr, index)
             key = stdscr.getch()
             # Move the selected option up or down
             if key == curses.KEY_UP:
@@ -128,13 +126,9 @@ class File:
                 self._setValueFilter(stdscr)
                 chosen = True
             
-            draw(stdscr, index)
-
     # Set the value to filter by
     def _setValueFilter(self, stdscr):
-        index = 0 # So we know where we are in the list
         chosen = False
-        options = ['0', '1', '5', '25', '100']
         valueStr = ''
 
         def draw(stdscr):
@@ -142,9 +136,8 @@ class File:
             stdscr.addstr(f"{self.filterColumn} is {self.operator} ____\n")
             stdscr.addstr(f"> {valueStr}\n", curses.A_STANDOUT)
 
-    
-        draw(stdscr)
         while chosen is False:
+            draw(stdscr)
             key = stdscr.getch()
             if key == curses.KEY_ENTER or key == 10 or key == 13:
                 self.value = valueStr
@@ -154,8 +147,6 @@ class File:
                 valueStr = valueStr[:-1]
             else:
                 valueStr += curses.keyname(key).decode('utf-8')
-            
-            draw(stdscr)
 
     #Update the data frame to be filtered accoring to values
     @_timing_decorator
@@ -181,7 +172,6 @@ class File:
         except:
             print(Fore.RED + f"Oops. Seems like you've entered a wrong value type for this column" + Fore.WHITE)
             return
-
 
     # Generating the updated CSV file with the filters
     @_timing_decorator
