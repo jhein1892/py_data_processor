@@ -4,9 +4,7 @@ import operator
 import time
 from colorama import Fore
 import os.path
-
-# /Users/jacobhein/Documents/MLBData       
-
+  
 class File:
 
     def __init__(self, name, finalName):
